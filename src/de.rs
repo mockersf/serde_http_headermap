@@ -284,7 +284,12 @@ impl<'de, 'a, R: Read> serde::de::Deserializer<'de> for &'a mut Deserializer<R> 
     where
         V: serde::de::Visitor<'de>,
     {
-        unimplemented!()
+        match self.current_field {
+            Index::None => visitor.visit_map(MapAccess::new(self, fields)),
+            _ => Err(Error {
+                message: "nested structs not supported".to_string(),
+            }),
+        }
     }
 
     fn deserialize_enum<V>(
